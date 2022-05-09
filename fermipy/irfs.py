@@ -565,7 +565,8 @@ class PSFModel(object):
 
         exp = calc_exp(skydir, ltc, event_class, event_types,
                        energies, cth_bins)
-
+        if sum(sum(np.abs(exp))) == 0:
+            raise RuntimeError('irfs.py(569): Zero exposure!')
         return cls(dtheta, energies, cth_bins, np.squeeze(exp), np.squeeze(psf),
                    np.squeeze(wts))
 
@@ -800,7 +801,7 @@ def create_wtd_psf(skydir, ltc, event_class, event_types, dtheta,
     """
     #npts = int(np.ceil(32. / bins_per_dec(egy_bins)))
     egy_bins = np.exp(utils.split_bin_edges(np.log(egy_bins), npts))
-    etrue_bins = 10**np.linspace(1.0, 6.5, np.int(np.ceil(nbin * 5.5 + 1)))
+    etrue_bins = 10**np.linspace(1.0, 6.5, int(np.ceil(nbin * 5.5 + 1)))
     etrue = 10**utils.edge_to_center(np.log10(etrue_bins))
 
     psf = create_avg_psf(skydir, ltc, event_class, event_types, dtheta,
@@ -832,7 +833,7 @@ def calc_drm(skydir, ltc, event_class, event_types,
     npts = int(np.ceil(128. / bins_per_dec(egy_bins)))
     egy_bins = np.exp(utils.split_bin_edges(np.log(egy_bins), npts))
 
-    etrue_bins = 10**np.linspace(1.0, 6.5, np.int(np.ceil(nbin * 5.5 + 1)))
+    etrue_bins = 10**np.linspace(1.0, 6.5, int(np.ceil(nbin * 5.5 + 1)))
     egy = 10**utils.edge_to_center(np.log10(egy_bins))
     egy_width = utils.edge_to_width(egy_bins)
     etrue = 10**utils.edge_to_center(np.log10(etrue_bins))
@@ -901,7 +902,7 @@ def calc_counts_edisp(skydir, ltc, event_class, event_types,
 
     # Split energy bins
     egy_bins = np.exp(utils.split_bin_edges(np.log(egy_bins), npts))
-    etrue_bins = 10**np.linspace(1.0, 6.5, np.int(np.ceil(nbin * 5.5 + 1)))
+    etrue_bins = 10**np.linspace(1.0, 6.5, int(np.ceil(nbin * 5.5 + 1)))
     drm = calc_drm(skydir, ltc, event_class, event_types,
                    egy_bins, cth_bins, nbin=nbin)
     cnts_etrue = calc_counts(skydir, ltc, event_class, event_types,
